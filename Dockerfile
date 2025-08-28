@@ -1,18 +1,20 @@
-# Use lightweight nginx image
-FROM nginx:alpine
+# Step 1: Use Node base image
+FROM node:18-alpine
 
-# Create directory for web app
-RUN mkdir -p /usr/share/nginx/html
+# Step 2: Set working directory
+WORKDIR /app
 
-# Copy validation file and static build
-COPY ./build /usr/share/nginx/html
-COPY ./validation-key.txt /usr/share/nginx/html/validation-key.txt
+# Step 3: Copy package files
+COPY package.json yarn.lock ./
 
-# Copy custom nginx config if needed
-COPY ./docker/nginx.conf /etc/nginx/conf.d/default.conf
+# Step 4: Install dependencies
+RUN yarn install --frozen-lockfile
 
-# Expose port 80
-EXPOSE 80
+# Step 5: Copy the rest of the code
+COPY . .
 
-# Run nginx in foreground
-CMD ["nginx", "-g", "daemon off;"]
+# Step 6: Build the app
+RUN yarn build
+
+# Step 7: Start the app
+CMD ["yarn", "start"]
