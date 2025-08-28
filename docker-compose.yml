@@ -1,47 +1,46 @@
-version: "3.9"
-services:
-  reverse-proxy:
-    build: ./reverse-proxy
-    environment:
-      HTTPS: ${HTTPS}
-      FRONTEND_DOMAIN_NAME: ${FRONTEND_DOMAIN_NAME}
-      BACKEND_DOMAIN_NAME: ${BACKEND_DOMAIN_NAME}
-      DOMAIN_VALIDATION_KEY: ${DOMAIN_VALIDATION_KEY}
-    ports:
-      - "80:80"
-      - "443:443"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    volumes:
-      - ${DATA_DIRECTORY}/reverse-proxy/etc-letsencrypt:/etc/letsencrypt/
+version: '3.9'
 
+services:
   frontend:
     build: ./frontend
+    ports:
+      - "3000:3000"
     environment:
-      BACKEND_URL: ${BACKEND_URL}
+      - NODE_ENV=development
+    depends_on:
+      - backend
 
   backend:
     build: ./backend
+    ports:
+      - "5000:5000"
     environment:
-      NODE_ENV: ${ENVIRONMENT}
-      SESSION_SECRET: ${SESSION_SECRET}
-      PI_API_KEY: ${PI_API_KEY}
-      PLATFORM_API_URL: ${PLATFORM_API_URL}
-      MONGO_HOST: mongo
-      MONGODB_DATABASE_NAME: ${MONGODB_DATABASE_NAME}
-      MONGODB_USERNAME: ${MONGODB_USERNAME}
-      MONGODB_PASSWORD: ${MONGODB_PASSWORD}
-      FRONTEND_URL: ${FRONTEND_URL}
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongo:27017/${MONGODB_DATABASE_NAME}
+      - MONGODB_USERNAME=${MONGODB_USERNAME}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+    depends_on:
+      - mongo
 
   mongo:
-    image: mongo:5.0
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+    image: mongo:6
     ports:
-      - 27027:27017
+      - "27027:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGODB_DATABASE_NAME}
     volumes:
-      - ${DATA_DIRECTORY}/mongo/data:/data/db
+      - mongo-data:/data/db
+
+  reverse-proxy:
+    build: ./reverse-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  mongo-data:
