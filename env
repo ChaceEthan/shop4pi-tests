@@ -1,17 +1,19 @@
-REACT_APP_API_URL=https://backend.coinlet.mydemoapp.com
-PI_APP_ID=your_app_id_here
-PI_API_KEY=your_api_key_here
-PI_ENV=sandbox
-FROM node:18-alpine AS build
-WORKDIR /app
-COPY package.json yarn.lock ./
-COPY .env ./
-RUN yarn install --frozen-lockfile
-COPY . .
-RUN yarn build
+FRONTEND_URL=https://coinlet.vercel.app
+FRONTEND_DOMAIN_NAME=coinlet.vercel.app
 
-FROM nginx:stable-alpine
-COPY --from=build /app/build /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+BACKEND_URL=https://backend.coinlet.mydemoapp.com
+BACKEND_DOMAIN_NAME=backend.coinlet.mydemoapp.com
+
+DOMAIN_VALIDATION_KEY=key_from_pi_portal
+PI_API_KEY=api_key_from_pi_portal
+
+SESSION_SECRET=random_secure_string
+
+MONGODB_DATABASE_NAME=demoapp
+MONGODB_USERNAME=demoapp
+MONGODB_PASSWORD=abcd1234
+
+COMPOSE_PROJECT_NAME=pi-demo-app
+ENVIRONMENT=production
+DATA_DIRECTORY=./docker-data
+PLATFORM_API_URL=https://api.minepi.com
