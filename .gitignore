@@ -3,8 +3,10 @@ build/
 dist/
 coverage/
 .env
-.env.
-.log
+.env.*
+*.log
 yarn-error.log
 yarn-debug.log
 .DS_Store
+.idea/
+.vscode/
