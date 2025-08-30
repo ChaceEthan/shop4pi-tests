@@ -1,0 +1,4 @@
+REACT_APP_API_URL=https://backend.coinlet.mydemoapp.com
+PI_APP_ID=your_app_id_here
+PI_API_KEY=your_api_key_here
+PI_ENV=sandbox
