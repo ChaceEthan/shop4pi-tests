@@ -2,7 +2,9 @@ version: '3.9'
 
 services:
   frontend:
-    build: ./frontend
+    build: ./shop4pi-tests
+    ports:
+      - "80:80"
     environment:
       - REACT_APP_API_URL=http://backend:5000
     depends_on:
@@ -14,9 +16,9 @@ services:
       - "5000:5000"
     environment:
       - NODE_ENV=production
-      - MONGODB_URI=mongodb://mongo:27017/${MONGODB_DATABASE_NAME}
-      - MONGODB_USERNAME=${MONGODB_USERNAME}
-      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - MONGODB_URI=mongodb://mongo:27017/shop4pi
+      - MONGODB_USERNAME=admin
+      - MONGODB_PASSWORD=password
     depends_on:
       - mongo
 
@@ -25,20 +27,11 @@ services:
     ports:
       - "27027:27017"
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
-      - MONGO_INITDB_DATABASE=${MONGODB_DATABASE_NAME}
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=shop4pi
     volumes:
       - mongo-data:/data/db
-
-  reverse-proxy:
-    build: ./reverse-proxy
-    ports:
-      - "80:80"
-      - "443:443"
-    depends_on:
-      - frontend
-      - backend
 
 volumes:
   mongo-data:
