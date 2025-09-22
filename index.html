@@ -1,21 +1,51 @@
-Skip to content
-Navigation Menu
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop4Pi Test</title>
+</head>
+<body>
+  <h1>Welcome to Shop4Pi Test</h1>
+  <button id="login">Login with Pi</button>
 
-code Search Results · repo:dicksonmayun123-cpu/shop4pi-test language:HTML
-Filter by
-0 files
- (0 ms)
-0 files
-in
-dicksonmayun123-cpu/shop4pi-test(press backspace or delete to remove)
-Your user account has been flagged, and cannot search code
-repo:dicksonmayun123-cpu/shop4pi-test language:HTML
-Mona looking through a globe hologram for code
-Your search did not match any code
-You could try one of the tips below.
+  <!-- Load Pi SDK -->
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
-Within a repository:
-repo:github/linguist
-Across several:
-repo:github/linguist OR repo:github/fetch
-Note that we don't currently support regular expressions in the repo or org qualifiers. For more information on search syntax, see our syntax guide.
+  <script>
+    // 1. Initialize Pi SDK (sandbox = true for testing, false for production)
+    Pi.init({ version: "2.0", sandbox: true });
+
+    // 2. Authentication scopes
+    const scopes = ['payments'];
+
+    // 3. Incomplete payments callback
+    function onIncompletePaymentFound(payment) {
+      const paymentId = payment.identifier;
+      const txid = payment.transaction.txid;
+
+      // Call backend to complete payment
+      fetch('/payment/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId, txid })
+      })
+      .then(res => res.json())
+      .then(data => console.log("Payment completed:", data))
+      .catch(err => console.error("Payment error:", err));
+    }
+
+    // 4. Login button action
+    document.getElementById("login").addEventListener("click", () => {
+      Pi.authenticate(scopes, onIncompletePaymentFound)
+        .then(auth => {
+          console.log("Authentication successful:", auth);
+          alert("Welcome " + auth.user.username);
+        })
+        .catch(error => {
+          console.error("Authentication failed:", error);
+        });
+    });
+  </script>
+</body>
+</html>
