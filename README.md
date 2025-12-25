@@ -1,1 +1,0 @@
-# shop4pi-tests
