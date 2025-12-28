@@ -11,17 +11,26 @@ export default async function handler(
 
   const { paymentId } = req.body;
 
-  const response = await axios.get(
-    `https://api.minepi.com/v2/payments/${paymentId}`,
-    {
-      headers: {
-        Authorization: `Key ${process.env.PI_API_KEY}`,
-      },
-    }
-  );
+  if (!paymentId) {
+    return res.status(400).json({ error: "paymentId is required" });
+  }
 
-  return res.status(200).json({
-    approved: true,
-    payment: response.data,
-  });
+  try {
+    const response = await axios.get(
+      `https://api.minepi.com/v2/payments/${paymentId}`,
+      {
+        headers: {
+          Authorization: `Key ${process.env.PI_API_KEY}`,
+        },
+      }
+    );
+
+    return res.status(200).json({
+      approved: true,
+      payment: response.data,
+    });
+  } catch (error: any) {
+    console.error(error.response?.data || error.message);
+    return res.status(500).json({ error: "Failed to fetch payment" });
+  }
 }
